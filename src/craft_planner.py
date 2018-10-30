@@ -41,6 +41,18 @@ def make_checker(rule):
     def check(state):
         # This code is called by graph(state) and runs millions of times.
         # Tip: Do something with rule['Consumes'] and rule['Requires'].
+        if 'Requires' in rule:
+            for requirement in rule['Requires']:
+                if state[requirement] > 0:
+                    #do nothing
+                else:
+                    return False
+        if 'Consumes' in rule:
+            for item in rule['Consumes']:
+                if state[item] >= rule['Consumes'][item]:
+                    #do nothing
+                else:
+                    return False
         return True
 
     return check
