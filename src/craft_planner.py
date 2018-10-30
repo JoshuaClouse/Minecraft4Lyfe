@@ -43,15 +43,11 @@ def make_checker(rule):
         # Tip: Do something with rule['Consumes'] and rule['Requires'].
         if 'Requires' in rule:
             for requirement in rule['Requires']:
-                if state[requirement] > 0:
-                    #do nothing
-                else:
+                if state[requirement] <= 0:
                     return False
         if 'Consumes' in rule:
             for item in rule['Consumes']:
-                if state[item] >= rule['Consumes'][item]:
-                    #do nothing
-                else:
+                if state[item] < rule['Consumes'][item]:
                     return False
         return True
 
