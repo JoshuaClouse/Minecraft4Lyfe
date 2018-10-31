@@ -63,7 +63,7 @@ def make_effector(rule):
         # This code is called by graph(state) and runs millions of times
         # Tip: Do something with rule['Produces'] and rule['Consumes'].
         next_state = None
-        next_state = state
+        next_state = state.copy()
         if 'Consumes' in rule:
             for item in rule['Consumes']:
                 next_state[item] -= rule['Consumes'][item]
@@ -80,8 +80,10 @@ def make_goal_checker(goal):
     # met the goal criteria. This code runs once, before the search is attempted.
 
     def is_goal(state):
-        # This code is used in the search process and may be called millions of times.
-        return False
+        for item in goal:
+            if goal[item] >= state[item]:
+                return False
+        return True
 
     return is_goal
 
@@ -96,8 +98,26 @@ def graph(state):
 
 
 def heuristic(state):
-    # Implement your heuristic here!
+    #I think the goal here is to find out what items it takes to get to the goal. This loop is making a list of all the items
+    #needed to get to the goal. I want to move this to the get_shopping_list 
+    '''
+    shopping_list = {}
+    for goalItem in state["Goal"]:
+        for recipe in state["Recipes"]:
+            #check each recipe for what it produces
+            for item in recipe["Produces"]:
+                if item == goalItem:
+    '''
+
+
     return 0
+
+#This function should ideally look at all the things needed to create the goal item/items by doing recursion since each goal item
+#will have sub items which will also have their own sub items
+#parameter is the items we need and a dictionary to put items into passed by reference
+def get_shopping_list(goalItems, shopping_list):
+    for goalItem in goals:
+        for recipe in Crafting["Recipes"]:
 
 def search(graph, state, is_goal, limit, heuristic):
 
