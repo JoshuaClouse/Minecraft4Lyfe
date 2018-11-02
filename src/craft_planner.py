@@ -1,6 +1,7 @@
 import json
 from collections import namedtuple, defaultdict, OrderedDict
 from timeit import default_timer as time
+from heapq import heappop, heappush
 
 Recipe = namedtuple('Recipe', ['name', 'check', 'effect', 'cost'])
 
@@ -68,8 +69,8 @@ def make_effector(rule):
             for item in rule['Consumes']:
                 next_state[item] -= rule['Consumes'][item]
         if 'Produces' in rule:
-            for item in rule['Produces']
-            next_state[item] += rule['Produces'][item]
+            for item in rule['Produces']:
+                next_state[item] += rule['Produces'][item]
         return next_state
 
     return effect
@@ -118,16 +119,17 @@ def heuristic(state):
 def get_shopping_list(goalItems, shopping_list):
     for goalItem in goals:
         for recipe in Crafting["Recipes"]:
+            return
 
 def search(graph, state, is_goal, limit, heuristic):
 
     start_time = time()
     
-    closed = []
+    closed = {}
     open = []
     heappush(open, (0, state))
     parents = {}
-    parent[state] = None
+    parents[state] = None
     costs = {}
     costs[state] = 0
     actions = {}
@@ -140,17 +142,20 @@ def search(graph, state, is_goal, limit, heuristic):
     while time() - start_time < limit:
         curr_cost, curr_state = heappop(open)
         if is_goal(curr_state):
+            print("states visisted: " + str(len(closed)))
             back_state = parents[curr_state]
             path = [(curr_state, actions[curr_state])]
             while parents[curr_state] != None:
+                #print("current state: "  + str(curr_state))
                 path.insert(0, (back_state, actions[back_state]))
                 curr_state = back_state
                 back_state = parents[back_state]
-                print(time() - start_time, "seconds.")
+                #print(time() - start_time, "seconds.")
+                print("Path length: " + str(len(path)))
                 return path
         #make copy to pass to graph since it's passed by reference
         temp_state = curr_state.copy()
-        for rule, new_state, time_cost in graph(temp_state)
+        for rule, new_state, time_cost in graph(temp_state):
             if new_state not in closed:
                 #because it's a heapqueue it will automatically sort by lowest value
                 heappush(open, (time_cost, new_state))
@@ -158,11 +163,11 @@ def search(graph, state, is_goal, limit, heuristic):
                 #is lower than the previous cost
                 if new_state not in costs:
                     costs[new_state] = time_cost
-                    parents[new_state] = state
+                    parents[new_state] = curr_state
                     actions[new_state] = rule
-                elif time_cost < costs[new_state]
+                elif time_cost < costs[new_state]:
                     costs[new_state] = time_cost
-                    parents[new_state] = state
+                    parents[new_state] = curr_state
                     actions[new_state] = rule
         closed[curr_state] = 1
                 
