@@ -1,5 +1,7 @@
 {
- "Initial": {},
+ "Initial": {
+   "cobble": 8, "bench": 1
+ },
  "Goal": {
    "furnace": 1
  },

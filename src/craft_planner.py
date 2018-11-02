@@ -1,6 +1,8 @@
+
 import json
 from collections import namedtuple, defaultdict, OrderedDict
 from timeit import default_timer as time
+from heapq import heappop, heappush
 
 Recipe = namedtuple('Recipe', ['name', 'check', 'effect', 'cost'])
 
@@ -11,7 +13,6 @@ class State(OrderedDict):
         for hashing, should you need to use a state as a key in another dictionary, e.g. distance[state] = 5. By
         default, dictionaries are not hashable. Additionally, when the state is converted to a string, it removes
         all items with quantity 0.
-
         Use of this state representation is optional, should you prefer another.
     """
 
@@ -68,8 +69,8 @@ def make_effector(rule):
             for item in rule['Consumes']:
                 next_state[item] -= rule['Consumes'][item]
         if 'Produces' in rule:
-            for item in rule['Produces']
-            next_state[item] += rule['Produces'][item]
+            for item in rule['Produces']:
+                next_state[item] += rule['Produces'][item]
         return next_state
 
     return effect
@@ -81,7 +82,7 @@ def make_goal_checker(goal):
 
     def is_goal(state):
         for item in goal:
-            if goal[item] >= state[item]:
+            if goal[item] > state[item]:
                 return False
         return True
 
@@ -112,24 +113,73 @@ def heuristic(state):
 
     return 0
 
+    
+
 #This function should ideally look at all the things needed to create the goal item/items by doing recursion since each goal item
 #will have sub items which will also have their own sub items
 #parameter is the items we need and a dictionary to put items into passed by reference
 def get_shopping_list(goalItems, shopping_list):
     for goalItem in goals:
         for recipe in Crafting["Recipes"]:
+            return
+
+
 
 def search(graph, state, is_goal, limit, heuristic):
 
     start_time = time()
-
+    
+    closed = {}
+    open = []
+    heappush(open, (0, state))
+    parents = {}
+    parents[state] = None
+    costs = {}
+    costs[state] = 0
+    actions = {}
+    actions[state] = None
+    path = []
     # Implement your search here! Use your heuristic here!
     # When you find a path to the goal return a list of tuples [(state, action)]
     # representing the path. Each element (tuple) of the list represents a state
     # in the path and the action that took you to this state
     while time() - start_time < limit:
-        pass
-
+        curr_cost, curr_state = heappop(open)
+        #print("current state: " + str(curr_state))
+        if is_goal(curr_state):
+            #print("states visisted: " + str(len(closed)))
+            back_state = parents[curr_state]
+            path = [(curr_state, actions[curr_state])]
+            i = 0
+            while parents[curr_state] != None:
+                #print("i: "  + str(i))
+                path.insert(0, (back_state, actions[back_state]))
+                curr_state = back_state
+                back_state = parents[back_state]
+                #print(time() - start_time, "seconds.")
+                #print("Path length: " + str(len(path)))
+            return path
+        #make copy to pass to graph since it's passed by reference
+        temp_state = curr_state.copy()
+        if curr_state in closed:
+            continue
+        for rule, new_state, time_cost in graph(temp_state):
+            #print("rule for new_state: " + str(rule))
+            if new_state not in closed:
+                #because it's a heapqueue it will automatically sort by lowest value
+                heappush(open, (time_cost, new_state))
+                #we only want to update the costs and parents dicts if the new_state isn't in there or if the new cost
+                #is lower than the previous cost
+                if new_state not in costs:
+                    costs[new_state] = time_cost
+                    parents[new_state] = curr_state
+                    actions[new_state] = rule
+                elif time_cost < costs[new_state]:
+                    costs[new_state] = time_cost
+                    parents[new_state] = curr_state
+                    actions[new_state] = rule
+        closed[curr_state] = 1
+                
     # Failed to find a path
     print(time() - start_time, 'seconds.')
     print("Failed to find a path from", state, 'within time limit.')
@@ -167,7 +217,7 @@ if __name__ == '__main__':
     state.update(Crafting['Initial'])
 
     # Search for a solution
-    resulting_plan = search(graph, state, is_goal, 5, heuristic)
+    resulting_plan = search(graph, state, is_goal, 30, heuristic)
 
     if resulting_plan:
         # Print resulting plan
