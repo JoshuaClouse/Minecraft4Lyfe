@@ -82,7 +82,7 @@ def make_goal_checker(goal):
 
     def is_goal(state):
         for item in goal:
-            if goal[item] >= state[item]:
+            if goal[item] > state[item]:
                 return False
         return True
 
@@ -141,21 +141,26 @@ def search(graph, state, is_goal, limit, heuristic):
     # in the path and the action that took you to this state
     while time() - start_time < limit:
         curr_cost, curr_state = heappop(open)
+        #print("current state: " + str(curr_state))
         if is_goal(curr_state):
-            print("states visisted: " + str(len(closed)))
+            #print("states visisted: " + str(len(closed)))
             back_state = parents[curr_state]
             path = [(curr_state, actions[curr_state])]
+            i = 0
             while parents[curr_state] != None:
-                #print("current state: "  + str(curr_state))
+                #print("i: "  + str(i))
                 path.insert(0, (back_state, actions[back_state]))
                 curr_state = back_state
                 back_state = parents[back_state]
                 #print(time() - start_time, "seconds.")
-                print("Path length: " + str(len(path)))
-                return path
+                #print("Path length: " + str(len(path)))
+            return path
         #make copy to pass to graph since it's passed by reference
         temp_state = curr_state.copy()
+        if curr_state in closed:
+            continue
         for rule, new_state, time_cost in graph(temp_state):
+            #print("rule for new_state: " + str(rule))
             if new_state not in closed:
                 #because it's a heapqueue it will automatically sort by lowest value
                 heappush(open, (time_cost, new_state))
