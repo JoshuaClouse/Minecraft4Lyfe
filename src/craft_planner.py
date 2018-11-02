@@ -122,14 +122,50 @@ def get_shopping_list(goalItems, shopping_list):
 def search(graph, state, is_goal, limit, heuristic):
 
     start_time = time()
-
+    
+    closed = []
+    open = []
+    heappush(open, (0, state))
+    parents = {}
+    parent[state] = None
+    costs = {}
+    costs[state] = 0
+    actions = {}
+    actions[state] = None
+    path = []
     # Implement your search here! Use your heuristic here!
     # When you find a path to the goal return a list of tuples [(state, action)]
     # representing the path. Each element (tuple) of the list represents a state
     # in the path and the action that took you to this state
     while time() - start_time < limit:
-        pass
-
+        curr_cost, curr_state = heappop(open)
+        if is_goal(curr_state):
+            back_state = parents[curr_state]
+            path = [(curr_state, actions[curr_state])]
+            while parents[curr_state] != None:
+                path.insert(0, (back_state, actions[back_state]))
+                curr_state = back_state
+                back_state = parents[back_state]
+                print(time() - start_time, "seconds.")
+                return path
+        #make copy to pass to graph since it's passed by reference
+        temp_state = curr_state.copy()
+        for rule, new_state, time_cost in graph(temp_state)
+            if new_state not in closed:
+                #because it's a heapqueue it will automatically sort by lowest value
+                heappush(open, (time_cost, new_state))
+                #we only want to update the costs and parents dicts if the new_state isn't in there or if the new cost
+                #is lower than the previous cost
+                if new_state not in costs:
+                    costs[new_state] = time_cost
+                    parents[new_state] = state
+                    actions[new_state] = rule
+                elif time_cost < costs[new_state]
+                    costs[new_state] = time_cost
+                    parents[new_state] = state
+                    actions[new_state] = rule
+        closed[curr_state] = 1
+                
     # Failed to find a path
     print(time() - start_time, 'seconds.')
     print("Failed to find a path from", state, 'within time limit.')
@@ -167,7 +203,7 @@ if __name__ == '__main__':
     state.update(Crafting['Initial'])
 
     # Search for a solution
-    resulting_plan = search(graph, state, is_goal, 5, heuristic)
+    resulting_plan = search(graph, state, is_goal, 1000, heuristic)
 
     if resulting_plan:
         # Print resulting plan
