@@ -101,6 +101,63 @@ def graph(state):
 def heuristic(state):
     #I think the goal here is to find out what items it takes to get to the goal. This loop is making a list of all the items
     #needed to get to the goal. I want to move this to the get_shopping_list 
+    #if 
+    for key in state:
+        if(key == "bench"):
+            if(state[key] > 1):
+                return 50000000
+        if(key == "furnace"):
+            if(state[key] > 1):
+                return 50000000
+        if(key == "wooden_pickaxe"):
+            if(state[key] > 1):
+                return 50000000
+        if(key == "stone_pickaxe"):
+            if(state[key] > 1):
+                return 50000000
+        if(key == "iron_pickaxe"):
+            if(state[key] > 1):
+                return 50000000
+        if(key == "wooden_axe"):
+            if(state[key] > 1):
+                return 50000000
+        if(key == "stone_axe"):
+            if(state[key] > 1):
+                return 50000000
+        if(key == "iron_axe"):
+            if(state[key] > 1):
+                return 50000000
+        if(key == "cobble"):
+            if(state[key] > 8):
+                return 50000000
+        if(key == "wood"):
+            if(state[key] > 1):
+                return 50000000
+        if(key == "plank"):
+            if(state[key] > 4):
+                return 50000000
+        if(key == "stick"):
+            if(state[key] > 8):
+                return 50000000
+        if(key == "ingot"):
+            if(state[key] > 6):
+                return 50000000
+        if(key == "ore"):
+            if(state[key] > 1):
+                return 50000000
+        if(key == "rail"):
+            if(state[key] > 16):
+                return 50000000
+        if(key == "cart"):
+            if(state[key] > 3):
+                return 50000000
+        if(key == "coal"):
+            if(state[key] > 1):
+                return 50000000
+        
+        
+        
+
     '''
     shopping_list = {}
     for goalItem in state["Goal"]:
@@ -113,15 +170,45 @@ def heuristic(state):
 
     return 0
 
-    
+
 
 #This function should ideally look at all the things needed to create the goal item/items by doing recursion since each goal item
 #will have sub items which will also have their own sub items
 #parameter is the items we need and a dictionary to put items into passed by reference
-def get_shopping_list(goalItems, shopping_list):
-    for goalItem in goals:
-        for recipe in Crafting["Recipes"]:
-            return
+def get_shopping_list(goalItems, initItems):
+    shopping_list = {}
+    #for goalItem in goals:
+    #    shopping_list[goalItem] = goalItems[goalItem]
+    for goalItem in goalItems:
+        shopping_list[goalItem] = goalItems[goalItem]
+        for name, rule in Crafting["Recipes"].items():
+            if goalItem in rule["Produces"]:
+                temp = {}
+                if "Requires" in rule:
+                    for neededItem in rule["Requires"]:
+                        temp[neededItem] = rule["Requires"][neededItem]
+                if "Consumes" in rule:
+                    for neededItem in rule["Consumes"]:
+                        temp[neededItem] = rule["Consumes"][neededItem] * shopping_list[goalItem]
+                    #print("Name: ")
+                    #print(neededItem, " : " , rule["Consumes"][neededItem])
+                    #print("Rule: ")
+                    #print(rule)
+                print("Temp :", temp)
+                temp = get_shopping_list(temp, initItems)
+                shopping_list.update(temp)
+    print("shopping_List", shopping_list)
+    return shopping_list
+
+
+"""
+class Node(object):
+    def init(self):
+        self.children = []
+        self.parent = None
+        self.data = None
+"""
+
 
 
 
@@ -143,6 +230,7 @@ def search(graph, state, is_goal, limit, heuristic):
     # When you find a path to the goal return a list of tuples [(state, action)]
     # representing the path. Each element (tuple) of the list represents a state
     # in the path and the action that took you to this state
+    count = 0
     while time() - start_time < limit:
         curr_cost, curr_state = heappop(open)
         #print("current state: " + str(curr_state))
@@ -167,7 +255,7 @@ def search(graph, state, is_goal, limit, heuristic):
             #print("rule for new_state: " + str(rule))
             if new_state not in closed:
                 #because it's a heapqueue it will automatically sort by lowest value
-                heappush(open, (time_cost, new_state))
+                heappush(open, (time_cost + curr_cost + heuristic(curr_state), new_state))
                 #we only want to update the costs and parents dicts if the new_state isn't in there or if the new cost
                 #is lower than the previous cost
                 if new_state not in costs:
@@ -178,7 +266,10 @@ def search(graph, state, is_goal, limit, heuristic):
                     costs[new_state] = time_cost
                     parents[new_state] = curr_state
                     actions[new_state] = rule
+        count += 1
+        print(count)
         closed[curr_state] = 1
+        
                 
     # Failed to find a path
     print(time() - start_time, 'seconds.')
@@ -202,6 +293,9 @@ if __name__ == '__main__':
     # print('Example recipe:','craft stone_pickaxe at bench ->',Crafting['Recipes']['craft stone_pickaxe at bench'])
 
     # Build rules
+    
+    #shopping_List = get_shopping_list(Crafting['Goal'], Crafting['Initial'])
+
     all_recipes = []
     for name, rule in Crafting['Recipes'].items():
         checker = make_checker(rule)
@@ -216,6 +310,7 @@ if __name__ == '__main__':
     state = State({key: 0 for key in Crafting['Items']})
     state.update(Crafting['Initial'])
 
+    print(state)
     # Search for a solution
     resulting_plan = search(graph, state, is_goal, 30, heuristic)
 
