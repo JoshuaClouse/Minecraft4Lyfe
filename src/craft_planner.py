@@ -245,6 +245,8 @@ def search(graph, state, is_goal, limit, heuristic):
                 curr_state = back_state
                 back_state = parents[back_state]
                 #print("Path length: " + str(len(path)))
+            while curr_cost > 50000000:
+                curr_cost -= 50000000
             return path, time() - start_time, curr_cost, curr_len
         #make copy to pass to graph since it's passed by reference
         temp_state = curr_state.copy()
@@ -267,7 +269,7 @@ def search(graph, state, is_goal, limit, heuristic):
                     parents[new_state] = curr_state
                     actions[new_state] = rule
         count += 1
-        print(count)
+        #print(count)
         closed[curr_state] = 1
         
                 
