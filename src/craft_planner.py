@@ -249,9 +249,10 @@ def search(graph, state, is_goal, limit, heuristic):
                 path.insert(0, (back_state, actions[back_state]))
                 curr_state = back_state
                 back_state = parents[back_state]
-                #print(time() - start_time, "seconds.")
+                
                 #print("Path length: " + str(len(path)))
             print("cost: " + str(curr_cost) + " len: " + str(len(path)-1))
+            print(time() - start_time, "seconds.")
             return path
         #make copy to pass to graph since it's passed by reference
         temp_state = curr_state.copy()
