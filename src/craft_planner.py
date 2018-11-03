@@ -13,7 +13,7 @@ class State(OrderedDict):
         for hashing, should you need to use a state as a key in another dictionary, e.g. distance[state] = 5. By
         default, dictionaries are not hashable. Additionally, when the state is converted to a string, it removes
         all items with quantity 0.
-        Use of this state representa`tion is optional, should you prefer another.
+        Use of this state representation is optional, should you prefer another.
     """
 
     def __key(self):
@@ -137,16 +137,16 @@ def heuristic(state):
             if(state[key] > 4):
                 return 50000000
         if(key == "stick"):
-            if(state[key] > 4):
+            if(state[key] > 8):
                 return 50000000
         if(key == "ingot"):
-            if(state[key] > 10):
+            if(state[key] > 6):
                 return 50000000
         if(key == "ore"):
             if(state[key] > 1):
                 return 50000000
         if(key == "rail"):
-            if(state[key] > 0):
+            if(state[key] > 16):
                 return 50000000
         if(key == "cart"):
             if(state[key] > 1):
@@ -223,8 +223,6 @@ def search(graph, state, is_goal, limit, heuristic):
     parents[state] = None
     costs = {}
     costs[state] = 0
-    rawCosts = {}
-    rawCosts[state] = 0
     actions = {}
     actions[state] = None
     path = []
@@ -233,36 +231,31 @@ def search(graph, state, is_goal, limit, heuristic):
     # representing the path. Each element (tuple) of the list represents a state
     # in the path and the action that took you to this state
     count = 0
-    check = 0
     while time() - start_time < limit:
-        queue_cost, curr_cost, curr_state = heappop(open)
+        curr_cost, curr_len, curr_state = heappop(open)
         #print("current state: " + str(curr_state))
         if is_goal(curr_state):
             #print("states visisted: " + str(len(closed)))
             back_state = parents[curr_state]
             path = [(curr_state, actions[curr_state])]
-            print("Cost:", curr_cost)
             i = 0
-            #print("cost: " + str(curr_cost) + " len: " + str(len(path)))
             while parents[curr_state] != None:
                 #print("i: "  + str(i))
                 path.insert(0, (back_state, actions[back_state]))
                 curr_state = back_state
                 back_state = parents[back_state]
-                
                 #print("Path length: " + str(len(path)))
-            print("cost: " + str(curr_cost) + " len: " + str(len(path)-1))
-            print(time() - start_time, "seconds.")
-            return path
+            return path, time() - start_time, curr_cost, curr_len
         #make copy to pass to graph since it's passed by reference
         temp_state = curr_state.copy()
+        curr_len += 1
         if curr_state in closed:
             continue
         for rule, new_state, time_cost in graph(temp_state):
             #print("rule for new_state: " + str(rule))
             if new_state not in closed:
                 #because it's a heapqueue it will automatically sort by lowest value
-                heappush(open, (time_cost + curr_cost + heuristic(curr_state), time_cost + curr_cost,  new_state)) 
+                heappush(open, (time_cost + curr_cost + heuristic(curr_state), curr_len, new_state))
                 #we only want to update the costs and parents dicts if the new_state isn't in there or if the new cost
                 #is lower than the previous cost
                 if new_state not in costs:
@@ -274,13 +267,10 @@ def search(graph, state, is_goal, limit, heuristic):
                     parents[new_state] = curr_state
                     actions[new_state] = rule
         count += 1
-        #print(count)
+        print(count)
         closed[curr_state] = 1
-        check = curr_cost
-    print(check)
         
                 
-    
     # Failed to find a path
     print(time() - start_time, 'seconds.')
     print("Failed to find a path from", state, 'within time limit.')
@@ -322,10 +312,13 @@ if __name__ == '__main__':
 
     print(state)
     # Search for a solution
-    resulting_plan = search(graph, state, is_goal, 30, heuristic)
+    resulting_plan, time, cost, length = search(graph, state, is_goal, 30, heuristic)
 
     if resulting_plan:
         # Print resulting plan
         for state, action in resulting_plan:
             print('\t',state)
             print(action)
+        print("Cost:", cost)
+        print("Actions:", length)
+        print("Time spent:", time)
