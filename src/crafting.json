@@ -1,5 +1,5 @@
 {
- "Initial": { "plank": 3, "stick": 2
+ "Initial": {
  },
  "Goal": {
   "cart" : 1, "rail" : 10
