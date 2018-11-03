@@ -13,7 +13,7 @@ class State(OrderedDict):
         for hashing, should you need to use a state as a key in another dictionary, e.g. distance[state] = 5. By
         default, dictionaries are not hashable. Additionally, when the state is converted to a string, it removes
         all items with quantity 0.
-        Use of this state representation is optional, should you prefer another.
+        Use of this state representa`tion is optional, should you prefer another.
     """
 
     def __key(self):
@@ -223,6 +223,8 @@ def search(graph, state, is_goal, limit, heuristic):
     parents[state] = None
     costs = {}
     costs[state] = 0
+    rawCosts = {}
+    rawCosts[state] = 0
     actions = {}
     actions[state] = None
     path = []
@@ -239,6 +241,7 @@ def search(graph, state, is_goal, limit, heuristic):
             back_state = parents[curr_state]
             path = [(curr_state, actions[curr_state])]
             i = 0
+            #print("cost: " + str(curr_cost) + " len: " + str(len(path)))
             while parents[curr_state] != None:
                 #print("i: "  + str(i))
                 path.insert(0, (back_state, actions[back_state]))
@@ -246,6 +249,7 @@ def search(graph, state, is_goal, limit, heuristic):
                 back_state = parents[back_state]
                 #print(time() - start_time, "seconds.")
                 #print("Path length: " + str(len(path)))
+            print("cost: " + str(curr_cost) + " len: " + str(len(path)-1))
             return path
         #make copy to pass to graph since it's passed by reference
         temp_state = curr_state.copy()
@@ -267,7 +271,7 @@ def search(graph, state, is_goal, limit, heuristic):
                     parents[new_state] = curr_state
                     actions[new_state] = rule
         count += 1
-        print(count)
+        #print(count)
         closed[curr_state] = 1
         
                 
