@@ -110,12 +110,16 @@ def create_heur(goalItems):
     if "rail" in goalItems:
         heuristicVals["stick"] = 8
 
+    for item in goalItems:
+        if goalItems[item] > heuristicVals[item]:
+            heuristicVals[item] = goalItems[item]
+
     return heuristicVals
 
 def heuristic(state):
     #I think the goal here is to find out what items it takes to get to the goal. This loop is making a list of all the items
     #needed to get to the goal. I want to move this to the get_shopping_list 
-    #if 
+    #if
     for key in state:
         if(key == "bench"):
             if(state[key] > heuristicVals[key]):
@@ -327,7 +331,7 @@ if __name__ == '__main__':
     state = State({key: 0 for key in Crafting['Items']})
     state.update(Crafting['Initial'])
 
-    print(state)
+    #print(state)
     # Search for a solution
     resulting_plan, time, cost, length = search(graph, state, is_goal, 30, heuristic)
 
