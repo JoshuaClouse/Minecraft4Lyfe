@@ -149,7 +149,7 @@ def heuristic(state):
             if(state[key] > 16):
                 return 50000000
         if(key == "cart"):
-            if(state[key] > 3):
+            if(state[key] > 1):
                 return 50000000
         if(key == "coal"):
             if(state[key] > 1):
