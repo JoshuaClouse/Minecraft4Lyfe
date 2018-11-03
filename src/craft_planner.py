@@ -137,19 +137,19 @@ def heuristic(state):
             if(state[key] > 4):
                 return 50000000
         if(key == "stick"):
-            if(state[key] > 8):
+            if(state[key] > 4):
                 return 50000000
         if(key == "ingot"):
-            if(state[key] > 6):
+            if(state[key] > 10):
                 return 50000000
         if(key == "ore"):
             if(state[key] > 1):
                 return 50000000
         if(key == "rail"):
-            if(state[key] > 16):
+            if(state[key] > 0):
                 return 50000000
         if(key == "cart"):
-            if(state[key] > 3):
+            if(state[key] > 1):
                 return 50000000
         if(key == "coal"):
             if(state[key] > 1):
@@ -218,7 +218,7 @@ def search(graph, state, is_goal, limit, heuristic):
     
     closed = {}
     open = []
-    heappush(open, (0, state))
+    heappush(open, (0, 0, state))
     parents = {}
     parents[state] = None
     costs = {}
@@ -231,13 +231,15 @@ def search(graph, state, is_goal, limit, heuristic):
     # representing the path. Each element (tuple) of the list represents a state
     # in the path and the action that took you to this state
     count = 0
+    check = 0
     while time() - start_time < limit:
-        curr_cost, curr_state = heappop(open)
+        queue_cost, curr_cost, curr_state = heappop(open)
         #print("current state: " + str(curr_state))
         if is_goal(curr_state):
             #print("states visisted: " + str(len(closed)))
             back_state = parents[curr_state]
             path = [(curr_state, actions[curr_state])]
+            print("Cost:", curr_cost)
             i = 0
             while parents[curr_state] != None:
                 #print("i: "  + str(i))
@@ -255,7 +257,7 @@ def search(graph, state, is_goal, limit, heuristic):
             #print("rule for new_state: " + str(rule))
             if new_state not in closed:
                 #because it's a heapqueue it will automatically sort by lowest value
-                heappush(open, (time_cost + curr_cost + heuristic(curr_state), new_state))
+                heappush(open, (time_cost + curr_cost + heuristic(curr_state), time_cost + curr_cost,  new_state)) 
                 #we only want to update the costs and parents dicts if the new_state isn't in there or if the new cost
                 #is lower than the previous cost
                 if new_state not in costs:
@@ -269,8 +271,11 @@ def search(graph, state, is_goal, limit, heuristic):
         count += 1
         print(count)
         closed[curr_state] = 1
+        check = curr_cost
+    print(check)
         
                 
+    
     # Failed to find a path
     print(time() - start_time, 'seconds.')
     print("Failed to find a path from", state, 'within time limit.')
