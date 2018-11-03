@@ -98,61 +98,75 @@ def graph(state):
             yield (r.name, r.effect(state), r.cost)
 
 
+def create_heur(goalItems):
+    heuristicVals = {}
+    heuristicVals["bench"] = heuristicVals["furnace"] = heuristicVals["wooden_pickaxe"] = heuristicVals["stone_pickaxe"] = heuristicVals["iron_pickaxe"] = heuristicVals["wooden_axe"] = heuristicVals["stone_axe"] = heuristicVals["iron_axe"] = 1
+    heuristicVals["wood"] = heuristicVals["ore"] = heuristicVals["cart"] = heuristicVals["coal"] = 1
+    heuristicVals["plank"] = heuristicVals["stick"] = 4
+    heuristicVals["ingot"] = 6
+    heuristicVals["cobble"] = 8
+    heuristicVals ["rail"] = 16
+
+    if "rail" in goalItems:
+        heuristicVals["stick"] = 8
+
+    return heuristicVals
+
 def heuristic(state):
     #I think the goal here is to find out what items it takes to get to the goal. This loop is making a list of all the items
     #needed to get to the goal. I want to move this to the get_shopping_list 
     #if 
     for key in state:
         if(key == "bench"):
-            if(state[key] > 1):
+            if(state[key] > heuristicVals[key]):
                 return 50000000
         if(key == "furnace"):
-            if(state[key] > 1):
+            if(state[key] > heuristicVals[key]):
                 return 50000000
         if(key == "wooden_pickaxe"):
-            if(state[key] > 1):
+            if(state[key] > heuristicVals[key]):
                 return 50000000
         if(key == "stone_pickaxe"):
-            if(state[key] > 1):
+            if(state[key] > heuristicVals[key]):
                 return 50000000
         if(key == "iron_pickaxe"):
-            if(state[key] > 1):
+            if(state[key] > heuristicVals[key]):
                 return 50000000
         if(key == "wooden_axe"):
-            if(state[key] > 1):
+            if(state[key] > heuristicVals[key]):
                 return 50000000
         if(key == "stone_axe"):
-            if(state[key] > 1):
+            if(state[key] > heuristicVals[key]):
                 return 50000000
         if(key == "iron_axe"):
-            if(state[key] > 1):
+            if(state[key] > heuristicVals[key]):
                 return 50000000
         if(key == "cobble"):
-            if(state[key] > 8):
+            if(state[key] > heuristicVals[key]):
                 return 50000000
         if(key == "wood"):
-            if(state[key] > 1):
+            if(state[key] > heuristicVals[key]):
                 return 50000000
         if(key == "plank"):
-            if(state[key] > 4):
+            if(state[key] > heuristicVals[key]):
                 return 50000000
         if(key == "stick"):
-            if(state[key] > 8):
+            if(state[key] > heuristicVals[key]):
                 return 50000000
         if(key == "ingot"):
-            if(state[key] > 6):
+            if(state[key] > heuristicVals[key]):
                 return 50000000
         if(key == "ore"):
-            if(state[key] > 1):
+            if(state[key] > heuristicVals[key]):
                 return 50000000
         if(key == "rail"):
-            if(state[key] > 16):
+            if(state[key] > heuristicVals[key]):
                 return 50000000
         if(key == "cart"):
-            if(state[key] > 1):
+            if(state[key] > heuristicVals[key]):
                 return 50000000
         if(key == "coal"):
-            if(state[key] > 1):
+            if(state[key] > heuristicVals[key]):
                 return 50000000
         
         
@@ -208,7 +222,6 @@ class Node(object):
         self.parent = None
         self.data = None
 """
-
 
 
 
@@ -296,6 +309,8 @@ if __name__ == '__main__':
     
     #shopping_List = get_shopping_list(Crafting['Goal'], Crafting['Initial'])
 
+    heuristicVals = []
+    heuristicVals = create_heur(Crafting['Goal'])
     all_recipes = []
     for name, rule in Crafting['Recipes'].items():
         checker = make_checker(rule)
@@ -319,6 +334,8 @@ if __name__ == '__main__':
         for state, action in resulting_plan:
             print('\t',state)
             print(action)
+        while(cost >= 50000000):
+            cost -= 50000000
         print("Cost:", cost)
         print("Actions:", length)
-        print("Time spent:", time)
+        print("Time spent:", time, "seconds")
