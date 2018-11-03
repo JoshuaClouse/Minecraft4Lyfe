@@ -140,13 +140,13 @@ def heuristic(state):
             if(state[key] > 4):
                 return 50000000
         if(key == "ingot"):
-            if(state[key] > 10):
+            if(state[key] > 6):
                 return 50000000
         if(key == "ore"):
             if(state[key] > 1):
                 return 50000000
         if(key == "rail"):
-            if(state[key] > 0):
+            if(state[key] > 16):
                 return 50000000
         if(key == "cart"):
             if(state[key] > 1):
@@ -269,7 +269,7 @@ def search(graph, state, is_goal, limit, heuristic):
                     parents[new_state] = curr_state
                     actions[new_state] = rule
         count += 1
-        print(count)
+        #print(count)
         closed[curr_state] = 1
         check = curr_cost
     print(check)
